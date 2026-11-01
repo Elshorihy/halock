@@ -45,6 +45,9 @@ function renderDevices(devices, selectedDevice) {
   targetNode.disabled = devices.length === 0 || !controlsReady;
   updateApplyState();
 }
+async function injectRouterAdapter(tabId) {
+  await chrome.scripting.executeScript({ target: { tabId }, files: ["router-main.js"], world: "MAIN" });
+}
 function updateApplyState() {
   applyButton.disabled = !controlsReady || !targetNode.value || !validDomain(domainNode.value);
 }
@@ -61,6 +64,7 @@ scanButton.addEventListener("click", async () => {
     if (!["http:", "https:"].includes(current.protocol) || current.hostname !== "192.168.1.1") {
       throw new Error("افتح صفحة الراوتر 192.168.1.1 أولًا.");
     }
+    await injectRouterAdapter(tab.id);
     const [devices, inspect] = await Promise.all([
       chrome.tabs.sendMessage(tab.id, { type: "HALOCK_DISCOVER_DEVICES" }),
       chrome.tabs.sendMessage(tab.id, { type: "HALOCK_ROUTER_INSPECT" })
@@ -90,6 +94,7 @@ applyButton.addEventListener("click", async () => {
   showStatus("جارٍ استدعاء وظائف صفحة الراوتر...");
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await injectRouterAdapter(tab.id);
     const result = await chrome.tabs.sendMessage(tab.id, { type: "HALOCK_ROUTER_APPLY", mac, domain });
     showStatus(result.message || "انتهت العملية دون رسالة واضحة.", !result.ok);
   } catch {
