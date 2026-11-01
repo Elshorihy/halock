@@ -152,6 +152,36 @@ async function handleApi(request: Request, env: Env, url: URL): Promise<Response
     return json({ now: Date.now() });
   }
 
+  if (path === "/auth/guest" && method === "POST") {
+    // Passwordless guest profile: a random bearer token is stored in the browser.
+    // This removes the login UI without exposing one shared public user account.
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    const rl = await enforceRateLimit(env.RATE_LIMIT, `guest:${ip}`, Date.now(), {
+      limit: 20,
+      windowSeconds: 300,
+    });
+    if (!rl.allowed) return error("طلبات كثيرة — حاول بعد قليل", 429, { "Retry-After": String(rl.retryAfterSeconds) });
+
+    const id = newId("guest");
+    const displayName = "مستخدم HALOCK";
+    const email = `${id}@guest.halock.invalid`;
+    const passwordHash = await hashPassword(crypto.randomUUID());
+    const user = await createUser(env.DB, { id, email, displayName, passwordHash });
+    const { token } = generateSessionToken();
+    const ttlDays = Number(env.SESSION_TTL_DAYS ?? 3650);
+    await createAuthSession(env.DB, {
+      id: newId("sess"),
+      userId: id,
+      tokenHash: hashToken(token, env.SESSION_SECRET),
+      expiresAt: new Date(Date.now() + ttlDays * 86400_000).toISOString(),
+    });
+    await saveSettingsRow(env.DB, id, DEFAULT_SETTINGS);
+    return json({
+      user: { id, displayName, createdAt: new Date().toISOString(), mode: "remote" } satisfies User,
+      token,
+    }, 201);
+  }
+
   if (path === "/auth/register" && method === "POST") {
     const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
     const rl = await enforceRateLimit(env.RATE_LIMIT, `register:${ip}`, Date.now(), {
