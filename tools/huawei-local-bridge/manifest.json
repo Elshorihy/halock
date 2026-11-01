@@ -1,33 +1,24 @@
 {
   "manifest_version": 3,
   "name": "HALOCK Huawei Local Bridge",
-  "version": "0.2.0",
-  "description": "Read-only device discovery for a locally administered Huawei DN8245V router.",
-  "permissions": [
-    "activeTab",
-    "tabs",
-    "clipboardWrite"
-  ],
-  "host_permissions": [
-    "http://192.168.1.1/*",
-    "https://192.168.1.1/*"
-  ],
-  "action": {
-    "default_title": "HALOCK Router Bridge",
-    "default_popup": "popup.html"
-  },
+  "version": "0.3.0",
+  "description": "Local device discovery and experimental Website Filter control for Huawei DN8245V.",
+  "permissions": ["activeTab", "tabs", "clipboardWrite"],
+  "host_permissions": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
+  "action": {"default_title": "HALOCK Router Bridge", "default_popup": "popup.html"},
   "content_scripts": [
     {
-      "matches": [
-        "http://192.168.1.1/*",
-        "https://192.168.1.1/*"
-      ],
-      "js": [
-        "device-parser.js",
-        "content.js"
-      ],
+      "matches": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
+      "js": ["device-parser.js", "content.js"],
       "run_at": "document_idle",
       "all_frames": true
+    },
+    {
+      "matches": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
+      "js": ["router-main.js"],
+      "run_at": "document_idle",
+      "world": "MAIN",
+      "all_frames": false
     }
   ]
 }
