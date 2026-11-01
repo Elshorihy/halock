@@ -553,6 +553,8 @@ export class RemoteDataSource implements DataSource {
   async deleteAccount(): Promise<void> {
     await this.request("/me", { method: "DELETE" });
     this.setToken(null);
+    // Start a fresh anonymous profile so the app remains usable after clearing data.
+    await this.createGuestSession();
   }
 
   async listSessions(): Promise<FocusSession[]> {
