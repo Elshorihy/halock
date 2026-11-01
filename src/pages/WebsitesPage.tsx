@@ -70,13 +70,17 @@ export function WebsitesPage() {
       setAddError(parsed.message ?? dict.websites.invalidDomain);
       return;
     }
-    const result = await addDomain({ domain: parsed.domain, category: newCategory });
-    if (!result.ok) {
-      setAddError(result.message === "duplicate" ? dict.websites.duplicate : result.message);
-      return;
+    try {
+      const result = await addDomain({ domain: parsed.domain, category: newCategory });
+      if (!result.ok) {
+        setAddError(result.message === "duplicate" ? dict.websites.duplicate : result.message);
+        return;
+      }
+      setNewDomain("");
+      toast(dict.websites.added, "success");
+    } catch (error) {
+      setAddError((error as Error).message || dict.toasts.error);
     }
-    setNewDomain("");
-    toast(dict.websites.added, "success");
   }
 
   function handleExport() {
@@ -357,9 +361,13 @@ export function WebsitesPage() {
                   toast(dict.websites.invalidDomain, "error");
                   return;
                 }
-                await updateDomain(editing.id, { domain: parsed.domain, category: editing.category });
-                setEditing(null);
-                toast(dict.websites.updated, "success");
+                try {
+                  await updateDomain(editing.id, { domain: parsed.domain, category: editing.category });
+                  setEditing(null);
+                  toast(dict.websites.updated, "success");
+                } catch (error) {
+                  toast((error as Error).message || dict.toasts.error, "error");
+                }
               }}
             >
               {dict.common.save}
@@ -408,9 +416,13 @@ export function WebsitesPage() {
               variant="danger"
               onClick={async () => {
                 if (!deleting) return;
-                await deleteDomain(deleting.id);
-                setDeleting(null);
-                toast(dict.websites.deleted, "success");
+                try {
+                  await deleteDomain(deleting.id);
+                  setDeleting(null);
+                  toast(dict.websites.deleted, "success");
+                } catch (error) {
+                  toast((error as Error).message || dict.toasts.error, "error");
+                }
               }}
             >
               {dict.common.delete}
