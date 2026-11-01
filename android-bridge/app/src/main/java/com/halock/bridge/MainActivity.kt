@@ -137,7 +137,7 @@ class MainActivity : Activity() {
         web.evaluateJavascript(js) { raw ->
             val result = try { JSONObject(org.json.JSONTokener(raw ?: "{}").nextValue().toString()) } catch (_: Exception) { JSONObject() }
             status.text = result.optString("message", result.optString("error", "تعذر تأكيد النتيجة"))
-            toast(status.text)
+            toast(status.text.toString())
         }
     }
 
