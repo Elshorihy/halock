@@ -1,51 +1,68 @@
 (() => {
   "use strict";
 
-  const MAC_PATTERN = /^(?:[0-9a-f]{2}:){5}[0-9a-f]{2}$/i;
+  function collectDocuments(rootDocument) {
+    const documents = [];
+    const seen = new Set();
+    const queue = [rootDocument];
 
-  function documentsForTab() {
-    const documents = [document];
-    for (const frame of document.querySelectorAll("iframe")) {
-      try {
-        if (frame.contentDocument) documents.push(frame.contentDocument);
-      } catch {
-        // Cross-origin frames are intentionally ignored.
+    while (queue.length) {
+      const doc = queue.shift();
+      if (!doc || seen.has(doc)) continue;
+      seen.add(doc);
+      documents.push(doc);
+
+      for (const frame of doc.querySelectorAll("iframe, frame")) {
+        try {
+          if (frame.contentDocument) queue.push(frame.contentDocument);
+        } catch {
+          // Cross-origin frames are intentionally ignored.
+        }
       }
     }
     return documents;
   }
 
   function discoverDevices() {
+    const parser = globalThis.HALOCKDeviceParser;
+    if (!parser) throw new Error("Device parser unavailable");
+
     const found = new Map();
-    for (const doc of documentsForTab()) {
-      const select = doc.querySelector(
+    for (const doc of collectDocuments(document)) {
+      const selectors = doc.querySelectorAll(
         'select#ChildrenList, select[name="ChildrenList"], select[id*="ChildrenList"]'
       );
-      if (!select) continue;
-
-      for (const option of Array.from(select.options)) {
-        const raw = String(option.value || "").trim();
-        const match = raw.match(/(?:[0-9a-f]{2}:){5}[0-9a-f]{2}/i);
-        if (!match || !MAC_PATTERN.test(match[0])) continue;
-        const mac = match[0].toLowerCase();
-        const label = String(option.textContent || "").trim();
-        if (!found.has(mac)) found.set(mac, { mac, label });
+      for (const select of selectors) {
+        for (const device of parser.parseDeviceOptions(select.options)) {
+          const existing = found.get(device.mac);
+          if (!existing || (!existing.label && device.label)) found.set(device.mac, device);
+        }
       }
     }
-    return Array.from(found.values());
+    return Array.from(found.values()).sort((a, b) =>
+      (a.label || a.mac).localeCompare(b.label || b.mac, undefined, { sensitivity: "base" })
+    );
   }
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (!message || message.type !== "HALOCK_DISCOVER_DEVICES") return false;
 
-    const devices = discoverDevices();
-    sendResponse({
-      ok: devices.length > 0,
-      devices,
-      message: devices.length
-        ? "تمت قراءة قائمة الأجهزة من صفحة الراوتر (قراءة فقط)."
-        : "لم أجد قائمة ChildrenList. افتح صفحة Parental Control داخل الراوتر وسجّل الدخول.",
-    });
+    try {
+      const devices = discoverDevices();
+      sendResponse({
+        ok: devices.length > 0,
+        devices,
+        message: devices.length
+          ? `تم العثور على ${devices.length} جهاز من صفحة الراوتر (قراءة فقط).`
+          : "لم أجد قائمة الأجهزة. افتح صفحة Parental Control داخل الراوتر وسجّل الدخول.",
+      });
+    } catch {
+      sendResponse({
+        ok: false,
+        devices: [],
+        message: "تعذر قراءة قائمة الأجهزة من الصفحة الحالية.",
+      });
+    }
     return false;
   });
 })();
