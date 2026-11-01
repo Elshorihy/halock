@@ -2,6 +2,8 @@
   "use strict";
   const EVENT = "HALOCK_ROUTER_LOCAL_ACTION";
   const RESPONSE = "HALOCK_ROUTER_LOCAL_RESULT";
+  if (window.__HALOCK_ROUTER_ADAPTER_INSTALLED) return;
+  window.__HALOCK_ROUTER_ADAPTER_INSTALLED = true;
 
   function documents() {
     const out = [document];
