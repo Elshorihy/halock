@@ -35,6 +35,7 @@ import { Badge, Button, Card, Input, Select } from "@/components/ui";
 export function RouterPage() {
   const {
     dict,
+    dataSource,
     routerConfig,
     routerLogs,
     saveRouterConfig,
@@ -59,8 +60,8 @@ export function RouterPage() {
     setSteps(routerConfig.manualSteps ?? {});
   }, [routerConfig]);
 
-  const manual = useMemo(() => new ManualRouterProvider(useAppDataSource()), []);
-  const automatic = useMemo(() => new AutomaticRouterProvider(useAppDataSource()), []);
+  const manual = useMemo(() => new ManualRouterProvider(dataSource), [dataSource]);
+  const automatic = useMemo(() => new AutomaticRouterProvider(dataSource), [dataSource]);
 
   const completedSteps = Object.values(steps).filter(Boolean).length;
   const allStepsDone = completedSteps >= 10;
@@ -72,7 +73,7 @@ export function RouterPage() {
     try {
       await saveRouterConfig({
         provider: mode,
-        integrationMode: mode === "manual" ? "manual" : "none",
+        integrationMode: mode,
         targetDevice: targetDevice.trim() || null,
         routerUrl: routerUrl.trim() || null,
         manualSteps: steps,
