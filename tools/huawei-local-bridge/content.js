@@ -31,14 +31,18 @@
   }
   function routerAction(action, data, sendResponse) {
     const requestId = String(Date.now()) + Math.random().toString(16).slice(2);
-    let settled = false;\n    const listener = (event) => {\n      if (settled) return;\n      settled = true;
-      if (event.source !== window || event.data?.channel !== "HALOCK_ROUTER_LOCAL_RESULT" || event.data.requestId !== requestId) return;
+    let settled = false;
+    const listener = (event) => {
+      if (settled || event.source !== window || event.data?.channel !== "HALOCK_ROUTER_LOCAL_RESULT" || event.data.requestId !== requestId) return;
+      settled = true;
       window.removeEventListener("message", listener);
       sendResponse(event.data);
     };
     window.addEventListener("message", listener);
     window.postMessage({ channel: "HALOCK_ROUTER_LOCAL_ACTION", requestId, action, ...data }, "*");
     setTimeout(() => {
+      if (settled) return;
+      settled = true;
       window.removeEventListener("message", listener);
       sendResponse({ ok: false, message: "انتهت مهلة انتظار صفحة الراوتر." });
     }, 10000);
