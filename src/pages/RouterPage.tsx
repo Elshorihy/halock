@@ -58,6 +58,7 @@ export function RouterPage() {
     setTargetDevice(routerConfig.targetDevice ?? "");
     setRouterUrl(routerConfig.routerUrl ?? "");
     setSteps(routerConfig.manualSteps ?? {});
+    setMode(routerConfig.integrationMode === "automatic" ? "automatic" : "manual");
   }, [routerConfig]);
 
   const manual = useMemo(() => new ManualRouterProvider(dataSource), [dataSource]);
@@ -77,7 +78,7 @@ export function RouterPage() {
         targetDevice: targetDevice.trim() || null,
         routerUrl: routerUrl.trim() || null,
         manualSteps: steps,
-        status: allStepsDone ? "manual-configured" : "manual-incomplete",
+        status: mode === "manual" ? (allStepsDone ? "manual-configured" : "manual-incomplete") : "disconnected",
       });
       toast(dict.router.saved, "success");
     } catch (e) {
@@ -93,7 +94,9 @@ export function RouterPage() {
     setTesting(true);
     setTestResult(null);
     try {
-      const result = await manual.verifyBlocking(domain);
+      const result = mode === "automatic"
+        ? await automatic.verifyBlocking(domain)
+        : await manual.verifyBlocking(domain);
       setTestResult(result);
     } catch (e) {
       setTestResult({
