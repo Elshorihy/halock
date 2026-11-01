@@ -62,7 +62,7 @@ import {
   isValidId,
   DEFAULT_SETTINGS,
 } from "../shared/validation";
-import { parseDomainInput, findDuplicate, parseImportedDomains } from "../shared/domains";
+import { DEFAULT_DOMAINS, parseDomainInput, findDuplicate, parseImportedDomains } from "../shared/domains";
 import { completeSession as completeSessionRule, planBlocking, canStartSession } from "../shared/session-logic";
 import { computeStats, filterSessionsByRange } from "../shared/stats";
 import type {
@@ -176,6 +176,16 @@ async function handleApi(request: Request, env: Env, url: URL): Promise<Response
       expiresAt: new Date(Date.now() + ttlDays * 86400_000).toISOString(),
     });
     await saveSettingsRow(env.DB, id, DEFAULT_SETTINGS);
+    for (const entry of DEFAULT_DOMAINS) {
+      await insertDomain(env.DB, {
+        id: newId("dom"),
+        userId: id,
+        domain: entry.domain,
+        category: entry.category,
+        enabled: true,
+        createdAt: new Date().toISOString(),
+      });
+    }
     return json({
       user: { id, displayName, createdAt: new Date().toISOString(), mode: "remote" } satisfies User,
       token,
