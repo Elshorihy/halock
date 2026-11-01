@@ -95,7 +95,7 @@ export function RouterPage() {
     setTestResult(null);
     try {
       const result = mode === "automatic"
-        ? await automatic.verifyBlocking(domain)
+        ? await automatic.verifyBlocking()
         : await manual.verifyBlocking(domain);
       setTestResult(result);
     } catch (e) {
