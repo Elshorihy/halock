@@ -1,26 +1,26 @@
-# HALOCK Huawei Local Bridge — 0.2.0
+# HALOCK Huawei Local Bridge — 0.3.0 experimental
 
-A **read-only** Chrome/Chromium extension for the Huawei DN8245V-56 WE router. It reads device labels and MAC addresses from the Parental Control device selector, including selectors inside same-origin nested frames.
-
-## Privacy and safety
-
-- No router forms are submitted and no router CGI endpoints are called.
-- No Website Filter settings, URL rules, schedules, or device associations are changed.
-- Router passwords, cookies, and session tokens are not read, stored, or transmitted.
-- No request is sent to HALOCK's Worker or any external server.
-- Cross-origin frames are ignored.
+A local Chrome/Chromium extension for the Huawei DN8245V-56 WE router. It discovers connected devices and offers an experimental single-device Website Filter action by invoking the router page's own JavaScript handlers.
 
 ## Install
 
 1. Extract or clone the HALOCK repository.
-2. Open `chrome://extensions` and enable **Developer mode**.
-3. Choose **Load unpacked** and select `tools/huawei-local-bridge`.
-4. Sign in to `https://192.168.1.1` yourself and open Parental Control / Website Filter.
-5. Open the extension and select **قراءة الأجهزة المتصلة**.
-6. Match the exact MAC address to the intended physical device. Similar device names are not sufficient.
+2. Open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked**, and select `tools/huawei-local-bridge`.
+3. Sign in to `http://192.168.1.1` or `https://192.168.1.1` yourself and open Parental Control / Website Filter.
+4. Open the extension and choose **قراءة الأجهزة وفحص عناصر الراوتر**.
+5. Select the exact device by MAC address, enter one domain, then press **تجربة إضافة النطاق للجهاز المحدد** and confirm.
 
-If the browser displays a certificate warning for the router's local HTTPS certificate, handle it in the browser yourself. The extension does not bypass certificate checks.
+## What the experimental action does
 
-## Scope
+- Requires an exact MAC match in the router's connected-device selector. It refuses the broadcast MAC.
+- Requires the router page to expose the expected device selector, specified-device scope, Blacklist selector, URL enable control, URL input, and the page's existing `OnApply` and `OnBtAddUrlClick` handlers.
+- Sets specified-device scope, selects the exact MAC, selects Blacklist, enables URL filtering, enters one domain, then calls the router page's existing handlers.
+- It does not send router credentials, cookies, or session tokens to HALOCK or any external server.
 
-This release improves local device discovery only. It does not control Website Filter. Automatic writes remain disabled until the router's saved device-to-template associations can be safely inspected, the target template is proven exclusive, existing settings can be backed up, and rollback/read-back can be tested on the local network.
+## Important test warning
+
+This is an **experimental, unverified write path** for the exact observed firmware family. A successful message only means the page handlers were invoked; it is not proof that the router saved the policy or that only one device is affected.
+
+The observed firmware handler uses Template 1 for URL rules. If other saved devices share Template 1, they may receive the same URL rules. The extension cannot currently prove template exclusivity, snapshot the complete prior policy, or automatically roll it back. Check the router's saved device associations and existing URL table before testing. After applying, verify the URL entry and test both the selected device and a second device. Restore the previous settings manually if the result is wrong.
+
+If the expected controls are missing, the extension fails closed and does not attempt the write. Do not paste router passwords, cookies, or session tokens into ChatGPT or HALOCK.
