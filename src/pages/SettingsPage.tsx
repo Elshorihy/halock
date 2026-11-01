@@ -11,13 +11,10 @@ import {
   Database,
   Download,
   Globe,
-  LogOut,
-  Mail,
   Palette,
   PlayCircle,
   ShieldAlert,
   Trash2,
-  User as UserIcon,
   Volume2,
 } from "lucide-react";
 import { useApp } from "@/lib/store";
@@ -33,44 +30,14 @@ export function SettingsPage() {
     setLang,
     settings,
     updateSettings,
-    user,
     isLocalMode,
-    authLogin,
-    authRegister,
-    authLogout,
     authDeleteAccount,
     exportData,
     clearLocalData,
     toast,
   } = useApp();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [authBusy, setAuthBusy] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-
-  async function handleAuth(mode: "login" | "register") {
-    setAuthBusy(true);
-    setAuthError(null);
-    try {
-      const result =
-        mode === "login"
-          ? await authLogin(email, password)
-          : await authRegister(displayName || "مستخدم HALOCK", email, password);
-      if (!result.ok) {
-        setAuthError(result.error ?? dict.settings.authFailed);
-      } else {
-        toast(dict.toasts.saved, "success");
-        setEmail("");
-        setPassword("");
-        setDisplayName("");
-      }
-    } finally {
-      setAuthBusy(false);
-    }
-  }
 
   async function handleExport() {
     const json = await exportData();
@@ -227,68 +194,19 @@ export function SettingsPage() {
         </div>
       </Card>
 
-      {/* Account */}
+      {/* Passwordless profile */}
       <Card>
-        <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-300">
-          <UserIcon size={16} /> {dict.settings.account}
+        <h2 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-300">
+          <Database size={16} /> الحساب
         </h2>
-
-        {isLocalMode ? (
-          <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-            <Badge tone="info">{dict.settings.accountLocal}</Badge>
-            <p className="mt-2.5 text-xs leading-relaxed text-slate-400">{dict.settings.accountLocalDesc}</p>
-          </div>
-        ) : user ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-glow/20">
-                <UserIcon size={20} className="text-violet-glow" />
-              </div>
-              <div>
-                <div className="font-semibold">{user.displayName}</div>
-                <div className="text-xs text-slate-500">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </div>
-              </div>
-            </div>
-            <Button variant="secondary" onClick={() => void authLogout()}>
-              <LogOut size={16} /> {dict.settings.logout}
-            </Button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <Input
-              label={dict.settings.displayName}
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-            />
-            <Input
-              label={dict.settings.email}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              label={dict.settings.password}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {authError && (
-              <div className="rounded-xl border border-red-500/30 bg-red-950/40 px-3.5 py-2.5 text-sm text-red-200">
-                {authError}
-              </div>
-            )}
-            <div className="flex gap-2">
-              <Button onClick={() => void handleAuth("login")} disabled={authBusy} className="flex-1">
-                <Mail size={16} /> {dict.settings.login}
-              </Button>
-              <Button variant="secondary" onClick={() => void handleAuth("register")} disabled={authBusy} className="flex-1">
-                {dict.settings.register}
-              </Button>
-            </div>
-          </div>
-        )}
+        <Badge tone={isLocalMode ? "warning" : "success"}>
+          {isLocalMode ? "وضع محلي على هذا الجهاز" : "ملف تلقائي بدون تسجيل دخول"}
+        </Badge>
+        <p className="mt-2 text-xs leading-relaxed text-slate-400">
+          {isLocalMode
+            ? "الخادم غير متاح حاليًا؛ بياناتك محفوظة في هذا المتصفح فقط."
+            : "تم إنشاء ملفك تلقائيًا. لا تحتاج إلى بريد إلكتروني أو كلمة مرور. يظل ملفك مرتبطًا بهذا المتصفح."}
+        </p>
       </Card>
 
       {/* Data export */}
