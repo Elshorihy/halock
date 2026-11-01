@@ -10,10 +10,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "worker:dev": "wrangler dev",
-    "worker:deploy": "wrangler deploy",
-    "deploy": "npm run build && wrangler deploy",
-    "db:init:local": "wrangler d1 execute halock-db --local --file=worker/db/schema.sql",
+    "worker:dev": "wrangler dev --config worker/wrangler.toml",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.toml",
+    "deploy": "npm run build && wrangler deploy --config worker/wrangler.toml",
+    "db:init:local": "wrangler d1 execute halock-db --local --file=worker/db/schema.sql --config worker/wrangler.toml",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
