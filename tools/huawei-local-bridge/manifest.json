@@ -11,7 +11,7 @@
       "matches": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
       "js": ["device-parser.js", "content.js"],
       "run_at": "document_idle",
-      "all_frames": true
+      "all_frames": false
     },
     {
       "matches": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
