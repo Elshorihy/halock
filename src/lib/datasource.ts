@@ -667,6 +667,12 @@ export class RemoteDataSource implements DataSource {
 /** Probe the API and return the best available data source. */
 export async function createDataSource(): Promise<DataSource> {
   try {
+    // Preserve an existing local profile when there is no remote session.
+    // Switching storage backends silently would make previous local data appear lost.
+    const hasLocalProfile = typeof localStorage !== "undefined" && !!localStorage.getItem(`${LS_PREFIX}db`);
+    const hasRemoteToken = typeof localStorage !== "undefined" && !!localStorage.getItem(`${LS_PREFIX}token`);
+    if (hasLocalProfile && !hasRemoteToken) return new LocalDataSource();
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2500);
     const res = await fetch("/api/health", { signal: controller.signal });
