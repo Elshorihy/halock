@@ -81,7 +81,9 @@ npm run deploy                            # بناء + رفع Worker + Assets
 | [docs/ENV_VARS.md](docs/ENV_VARS.md) | متغيرات البيئة والأسرار |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | النشر على Cloudflare خطوة بخطوة |
 | [docs/ROUTER_SETUP.md](docs/ROUTER_SETUP.md) | إعداد Huawei DN8245V يدويًا + الاسترداد |
-| [docs/ROUTER_API_EXTENSION.md](docs/ROUTER_API_EXTENSION.md) | كيفية إضافة Router API تلقائيًا لاحقًا |\n| [docs/ROUTER_FIRMWARE_FINDINGS.md](docs/ROUTER_FIRMWARE_FINDINGS.md) | نتائج فحص Firmware DN8245V وحدود التحكم الآمن بجهاز واحد |
+| [docs/ROUTER_API_EXTENSION.md](docs/ROUTER_API_EXTENSION.md) | كيفية إضافة Router API تلقائيًا لاحقًا |
+| [docs/ROUTER_FIRMWARE_FINDINGS.md](docs/ROUTER_FIRMWARE_FINDINGS.md) | نتائج فحص Firmware DN8245V وحدود التحكم الآمن بجهاز واحد |
+| [tools/huawei-local-bridge/README.md](tools/huawei-local-bridge/README.md) | إضافة متصفح محلية لاكتشاف أجهزة الراوتر (قراءة فقط) |
 | [docs/MANUAL_TESTING.md](docs/MANUAL_TESTING.md) | سيناريوهات الاختبار اليدوي (10 حالات فشل + الراوتر) |
 | [docs/TESTS.md](docs/TESTS.md) | قائمة الاختبارات ونتائجها |
 
