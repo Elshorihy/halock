@@ -31,7 +31,7 @@
   }
   function routerAction(action, data, sendResponse) {
     const requestId = String(Date.now()) + Math.random().toString(16).slice(2);
-    const listener = (event) => {
+    let settled = false;\n    const listener = (event) => {\n      if (settled) return;\n      settled = true;
       if (event.source !== window || event.data?.channel !== "HALOCK_ROUTER_LOCAL_RESULT" || event.data.requestId !== requestId) return;
       window.removeEventListener("message", listener);
       sendResponse(event.data);
