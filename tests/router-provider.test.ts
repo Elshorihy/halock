@@ -74,7 +74,7 @@ describe("ManualRouterProvider", () => {
     expect(diag.message).toContain("لا يوجد اتصال");
   });
 
-  it("verifyBlocking reports likely-blocked when fetch fails while online", async () => {
+  it("verifyBlocking does not mistake a network failure for proof of router blocking", async () => {
     Object.defineProperty(globalThis, "navigator", {
       value: { onLine: true },
       configurable: true,
@@ -84,7 +84,23 @@ describe("ManualRouterProvider", () => {
     globalThis.fetch = (() => Promise.reject(new TypeError("network error"))) as typeof fetch;
     try {
       const diag = await provider.verifyBlocking("youtube.com");
-      expect(diag.result).toBe("likely-blocked");
+      expect(diag.result).toBe("unverified");
+      expect(diag.ok).toBe(false);
+      expect(diag.message).toContain("لا يمكن الجزم");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("verifyBlocking rejects invalid domain input before making a request", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (() => {
+      throw new Error("fetch should not be called");
+    }) as typeof fetch;
+    try {
+      const diag = await provider.verifyBlocking("https://youtube.com/path");
+      expect(diag.result).toBe("error");
+      expect(diag.message).toContain("نطاق صحيح");
     } finally {
       globalThis.fetch = originalFetch;
     }

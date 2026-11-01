@@ -1,0 +1,35 @@
+name: HALOCK checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "feat/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check local router extension syntax
+        run: |
+          node --check tools/huawei-local-bridge/device-parser.js
+          node --check tools/huawei-local-bridge/content.js
+          node --check tools/huawei-local-bridge/router-main.js
+          node --check tools/huawei-local-bridge/popup.js
+      - name: Run tests
+        run: npm test
+      - name: Type-check and build
+        run: npm run build

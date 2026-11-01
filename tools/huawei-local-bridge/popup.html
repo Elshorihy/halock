@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HALOCK Router Bridge</title>
+  <style>
+    body{font:14px system-ui,sans-serif;width:360px;margin:0;padding:16px;background:#0b1020;color:#eef2ff}
+    h1{font-size:17px;margin:0 0 8px}
+    p{color:#aab4cc;line-height:1.6;margin:8px 0 12px}
+    button,select,input{box-sizing:border-box;width:100%;border:1px solid #39445f;border-radius:10px;padding:10px;background:#151d32;color:#eef2ff;font:inherit}
+    button{border:0;background:#8b5cf6;font-weight:700;cursor:pointer;margin-top:8px}
+    button:disabled{opacity:.5;cursor:wait}
+    label{display:block;font-size:12px;color:#cbd5e1;margin:12px 0 5px}
+    #status{font-size:12px;margin:12px 0;color:#c4b5fd;line-height:1.6}
+    #selected{padding:10px;border:1px solid #8b5cf6;border-radius:10px;background:#21183c;color:#ddd6fe;font-size:12px;line-height:1.6;margin:10px 0}
+    #devices{display:grid;gap:8px;margin-top:10px;max-height:190px;overflow:auto}
+    .device{padding:8px;border:1px solid #303a55;border-radius:10px;background:#151d32}
+    .label{font-weight:700;overflow-wrap:anywhere}
+    code{display:block;color:#a5b4fc;margin:5px 0;direction:ltr;text-align:left}
+    .state{font-size:11px;color:#94a3b8}
+    .copy{width:auto;background:#334155;font-size:11px;padding:5px 8px}
+    .warning{font-size:11px;color:#fbbf24;border-top:1px solid #303a55;padding-top:10px;margin-top:14px;line-height:1.6}
+    #apply{background:#b45309}
+  </style>
+</head>
+<body>
+  <h1>HALOCK · ربط راوتر Huawei</h1>
+  <p>اقرأ الأجهزة أولًا، ثم اختر الجهاز بالـ MAC وأدخل نطاقًا واحدًا للتجربة.</p>
+  <button id="scan">قراءة الأجهزة وفحص عناصر الراوتر</button>
+  <div id="status" role="status">افتح صفحة Parental Control / Website Filter في تبويب الراوتر وسجّل الدخول.</div>
+  <div id="selected" hidden></div>
+  <div id="devices"></div>
+  <label for="target">الجهاز المستهدف (مطابقة MAC حرفيًا)</label>
+  <select id="target" disabled><option value="">اقرأ الأجهزة أولًا</option></select>
+  <label for="domain">الموقع المراد حجبه (نطاق واحد)</label>
+  <input id="domain" type="text" placeholder="example.com" autocomplete="off">
+  <button id="apply" disabled>تجربة إضافة النطاق للجهاز المحدد</button>
+  <div class="warning">وضع تجريبي: يستخدم وظائف صفحة الراوتر نفسها ويضبط Blacklist + تفعيل الفلتر. قد يؤثر تعديل Template 1 على أجهزة أخرى مرتبطة به. لا تضغط إلا بعد اختيار MAC الصحيح. تأكد يدويًا من جدول URL ومن جهاز آخر بعد التجربة.</div>
+  <script src="device-parser.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

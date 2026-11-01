@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "HALOCK Huawei Local Bridge",
+  "version": "0.3.0",
+  "description": "Local device discovery and experimental Website Filter control for Huawei DN8245V.",
+  "permissions": ["activeTab", "tabs", "scripting", "clipboardWrite"],
+  "host_permissions": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
+  "action": {"default_title": "HALOCK Router Bridge", "default_popup": "popup.html"},
+  "content_scripts": [
+    {
+      "matches": ["http://192.168.1.1/*", "https://192.168.1.1/*"],
+      "js": ["device-parser.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
