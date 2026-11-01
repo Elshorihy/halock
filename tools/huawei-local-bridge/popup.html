@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HALOCK Router Bridge</title>
+  <style>
+    body{font:14px system-ui,sans-serif;width:340px;margin:0;padding:16px;background:#0b1020;color:#eef2ff}
+    h1{font-size:17px;margin:0 0 8px}
+    p{color:#aab4cc;line-height:1.6;margin:8px 0 12px}
+    button{border:0;border-radius:10px;padding:10px 13px;background:#8b5cf6;color:white;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.5;cursor:wait}
+    #status{font-size:12px;margin:12px 0;color:#c4b5fd}
+    #devices{display:grid;gap:8px;margin-top:10px}
+    .device{padding:10px;border:1px solid #303a55;border-radius:10px;background:#151d32}
+    .label{font-weight:700;overflow-wrap:anywhere}
+    code{display:block;color:#a5b4fc;margin:5px 0;direction:ltr;text-align:left}
+    .copy{background:#334155;font-size:12px;padding:6px 9px}
+    .warning{font-size:11px;color:#fbbf24;border-top:1px solid #303a55;padding-top:10px;margin-top:14px}
+  </style>
+</head>
+<body>
+  <h1>HALOCK · ربط راوتر Huawei</h1>
+  <p>قارئ محلي للأجهزة المتصلة. لا يغيّر أي إعداد في الراوتر.</p>
+  <button id="scan">قراءة الأجهزة المتصلة</button>
+  <div id="status" role="status">افتح صفحة Parental Control في تبويب الراوتر أولًا.</div>
+  <div id="devices"></div>
+  <div class="warning">نسخة قراءة فقط: لا تضيف مواقع ولا تحفظ تغييرات ولا تتصل بأي خادم خارجي.</div>
+  <script src="popup.js"></script>
+</body>
+</html>
