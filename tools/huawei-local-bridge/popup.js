@@ -28,7 +28,7 @@ function renderDevices(devices) {
         await navigator.clipboard.writeText(device.mac);
         copy.textContent = "تم النسخ";
       } catch {
-        showStatus("تعذر النسخ من المتصفح. يمكنك تحديد عنوان MAC ونسخه يدويًا.", true);
+        showStatus("تعذر النسخ تلقائيًا. حدّد عنوان MAC وانسخه يدويًا.", true);
       }
     });
 
@@ -43,17 +43,22 @@ scanButton.addEventListener("click", async () => {
   showStatus("جارٍ قراءة صفحة الراوتر...");
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) throw new Error("افتح تبويب الراوتر أولًا.");
+    if (!tab?.id || !tab.url) throw new Error("لا يوجد تبويب نشط.");
+    const current = new URL(tab.url);
+    if (!["http:", "https:"].includes(current.protocol) || current.hostname !== "192.168.1.1") {
+      throw new Error("افتح صفحة الراوتر 192.168.1.1 أولًا.");
+    }
 
     const result = await chrome.tabs.sendMessage(tab.id, {
       type: "HALOCK_DISCOVER_DEVICES",
     });
-
     showStatus(result.message, !result.ok);
     renderDevices(result.devices || []);
-  } catch {
+  } catch (error) {
     showStatus(
-      "لم أستطع الوصول للصفحة. افتح https://192.168.1.1 ثم Parental Control، وبعدها افتح الإضافة.",
+      error instanceof Error && error.message.includes("192.168.1.1")
+        ? error.message
+        : "تعذر الوصول. افتح 192.168.1.1 ثم صفحة Parental Control وسجّل الدخول.",
       true
     );
   } finally {
