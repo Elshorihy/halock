@@ -1,34 +1,21 @@
 # HALOCK — Cloudflare Worker configuration
-name = "halock-api"
-main = "worker/index.ts"
+name = "halock"
+main = "./index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
-# Serve the built frontend from the same Worker (single origin → no CORS issues).
+# Serve the built frontend from the repository root dist/ directory.
 [assets]
-directory = "./dist"
+directory = "../dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
 
-# D1 database (create with: wrangler d1 create halock-db, then paste the id below).
+# Existing production D1 database.
 [[d1_databases]]
 binding = "DB"
 database_name = "halock-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
-
-# Optional KV for shared rate limiting across isolates (create with: wrangler kv namespace create RATE_LIMIT).
-# Without it, rate limiting falls back to per-isolate in-memory windows (documented).
-# [[kv_namespaces]]
-# binding = "RATE_LIMIT"
-# id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+database_id = "bfc96865-a8df-4044-8fd0-5ee1b97f726a"
 
 [vars]
-# Origin allowed to call the API when served separately. When using [assets]
-# above, the app is same-origin and this can stay as is.
 ALLOWED_ORIGIN = "*"
-
-# Session lifetime in days.
 SESSION_TTL_DAYS = "30"
-
-# Secrets (set with `wrangler secret put <NAME>`, never commit them):
-#   SESSION_SECRET  — optional pepper for session token hashing (recommended).
