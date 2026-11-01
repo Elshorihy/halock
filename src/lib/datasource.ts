@@ -517,6 +517,19 @@ export class RemoteDataSource implements DataSource {
     }
   }
 
+  async createGuestSession(): Promise<boolean> {
+    try {
+      const data = await this.request<{ user: User; token: string }>("/auth/guest", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      this.setToken(data.token);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async logout(): Promise<void> {
     try {
       await this.request("/auth/logout", { method: "POST" });
@@ -658,7 +671,13 @@ export async function createDataSource(): Promise<DataSource> {
     clearTimeout(timeout);
     if (res.ok) {
       const remote = new RemoteDataSource();
-      // If a token exists but is invalid, currentUser() clears it gracefully.
+      // Ensure every browser has a private, passwordless guest profile.
+      // Existing guest tokens are reused; invalid/missing tokens are replaced.
+      const current = await remote.currentUser();
+      if (!current) {
+        const created = await remote.createGuestSession();
+        if (!created) return new LocalDataSource();
+      }
       return remote;
     }
   } catch {
