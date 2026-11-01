@@ -1,7 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+declare global {
+  // Exposed by the extension's classic-script parser in the isolated world.
+  var HALOCKDeviceParser: {
+    parseDeviceOptions(options: Array<{ value?: string; textContent?: string }>): Array<{ mac: string; label: string }>;
+  };
+}
+
 describe("HALOCK local bridge device parser", () => {
   beforeEach(async () => {
+    // @ts-expect-error The extension parser is a classic script, not a TypeScript module.
     await import("../tools/huawei-local-bridge/device-parser.js");
   });
 
@@ -12,8 +20,8 @@ describe("HALOCK local bridge device parser", () => {
       { value: "AA:BB:CC:DD:EE:FF", textContent: "Tablet" },
     ]);
     expect(result).toEqual([
-      { mac: "aa:bb:cc:dd:ee:ff", label: "Tablet" },
       { mac: "f0:6c:5d:32:d4:2e", label: "Redmi 10" },
+      { mac: "aa:bb:cc:dd:ee:ff", label: "Tablet" },
     ]);
   });
 
