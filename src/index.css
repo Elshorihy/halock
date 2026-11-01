@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink-950 text-slate-100 font-sans antialiased;
+    background-image: theme("backgroundImage.halock-radial");
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Touch-friendly targets everywhere (spec: لا تعتمد على Hover). */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  ::selection {
+    @apply bg-violet-glow/40 text-white;
+  }
+
+  /* Respect reduced motion at the platform level. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-md border border-white/[0.08] shadow-glass;
+  }
+
+  .glass-strong {
+    @apply bg-ink-850/80 backdrop-blur-xl border border-white/10 shadow-glass;
+  }
+
+  .halock-input {
+    @apply w-full rounded-xl bg-ink-800/80 border border-white/10 px-4 py-3 text-slate-100
+      placeholder:text-slate-500 outline-none transition
+      focus:border-violet-glow/60 focus:ring-2 focus:ring-violet-glow/25;
+  }
+
+  .halock-label {
+    @apply block text-sm text-slate-400 mb-1.5 font-medium;
+  }
+
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-glow/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 min-h-[56px] min-w-[64px]
+      text-slate-400 transition-colors;
+  }
+
+  .nav-item-active {
+    @apply text-focus bg-white/[0.06];
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+  }
+}
+
+/* Custom scrollbar — subtle, dark */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.35);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.55);
+}
+
+/* Service-worker / offline banner does not shift layout */
+.no-scroll {
+  overflow: hidden;
+}

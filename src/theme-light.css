@@ -1,0 +1,89 @@
+/**
+ * HALOCK — light theme overrides (opt-in via `html.light`).
+ * The dark theme is the identity; this is a genuine, readable light variant.
+ */
+
+html.light body {
+  background-color: #eef2f7;
+  background-image: radial-gradient(1000px 500px at 80% -10%, rgba(139, 92, 246, 0.12), transparent 60%),
+    radial-gradient(800px 420px at 10% 110%, rgba(34, 211, 238, 0.1), transparent 55%);
+  color: #0f172a;
+}
+
+html.light .glass,
+html.light .glass-strong {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+}
+
+html.light header,
+html.light nav {
+  background: rgba(238, 242, 247, 0.85) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .halock-input {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+}
+
+html.light .halock-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Text utility overrides used across the app */
+html.light .text-slate-100,
+html.light .text-slate-200,
+html.light .text-white {
+  color: #0f172a;
+}
+html.light .text-slate-300 {
+  color: #1e293b;
+}
+html.light .text-slate-400 {
+  color: #475569;
+}
+html.light .text-slate-500 {
+  color: #64748b;
+}
+
+html.light .border-white\/\[0\.06\],
+html.light .border-white\/\[0\.07\],
+html.light .border-white\/\[0\.08\],
+html.light .border-white\/10 {
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.05\],
+html.light .bg-white\/\[0\.06\],
+html.light .bg-white\/\[0\.07\],
+html.light .bg-white\/\[0\.08\] {
+  background-color: rgba(15, 23, 42, 0.05);
+}
+
+html.light .bg-ink-950\/80,
+html.light .bg-ink-950\/90,
+html.light .bg-ink-800\/80,
+html.light .bg-ink-800\/90,
+html.light .bg-ink-850\/80 {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+html.light .text-focus {
+  color: #0e7490;
+}
+html.light .text-violet-glow {
+  color: #7c3aed;
+}
+html.light .nav-item-active {
+  background-color: rgba(15, 23, 42, 0.07);
+  color: #0e7490;
+}
+html.light .focus-visible-ring {
+  --tw-ring-offset-color: #eef2f7;
+}

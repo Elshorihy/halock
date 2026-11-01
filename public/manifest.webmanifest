@@ -1,0 +1,46 @@
+{
+  "name": "HALOCK — اقفل المشتتات. افتح تركيزك.",
+  "short_name": "HALOCK",
+  "description": "منصة جلسات التركيز وحجب المواقع مع تكامل الراوتر. Lock the distractions. Open your focus.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0d13",
+  "theme_color": "#0b0d13",
+  "categories": ["productivity", "education", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "جلسة تركيز",
+      "short_name": "تركيز",
+      "url": "/#/focus"
+    },
+    {
+      "name": "المواقع المحجوبة",
+      "short_name": "المواقع",
+      "url": "/#/websites"
+    }
+  ]
+}
