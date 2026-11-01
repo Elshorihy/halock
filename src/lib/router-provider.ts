@@ -160,8 +160,23 @@ export class ManualRouterProvider implements RouterProvider {
    *  - A network error suggests blocking OR an offline device → reported accordingly.
    */
   async verifyBlocking(domain: string): Promise<RouterDiagnostics> {
-    const testUrl = `https://${domain}/favicon.ico`;
+    const normalizedDomain = domain.trim().toLowerCase();
+    const validDomain =
+      normalizedDomain.length <= 253 &&
+      /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/.test(normalizedDomain);
 
+    if (!validDomain) {
+      return {
+        ok: false,
+        operation: "verify",
+        result: "error",
+        message: "اكتب اسم نطاق صحيحًا مثل youtube.com.",
+        messageEn: "Enter a valid domain name, for example youtube.com.",
+        createdAt: nowIso(),
+      };
+    }
+
+    const testUrl = `https://${normalizedDomain}/favicon.ico`;
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       return {
         ok: false,
@@ -176,43 +191,44 @@ export class ManualRouterProvider implements RouterProvider {
     let result: RouterDiagnostics["result"] = "unverified";
     let message = "تعذر التحقق من حالة الحجب.";
     let messageEn = "Could not verify the blocking state.";
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
 
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 6000);
       await fetch(testUrl, {
         method: "GET",
         mode: "no-cors",
         cache: "no-store",
         signal: controller.signal,
       });
-      clearTimeout(timer);
-      // Opaque response: the server answered → the site is likely reachable.
+      // A resolved no-cors request suggests reachability, but is not proof.
       result = "likely-reachable";
-      message = "يبدو أن الموقع متاحًا (لم يُحجب بعد).";
-      messageEn = "The site appears reachable (not blocked yet).";
+      message = "استجاب طلب الاختبار؛ يبدو أن الموقع متاح، لكن الاختبار ليس إثباتًا نهائيًا.";
+      messageEn = "The probe completed; the site appears reachable, but this is not definitive proof.";
     } catch {
-      // Network error: could be blocked by the router, DNS failure, or offline.
+      // A failed request is ambiguous: router block, DNS, TLS, timeout, or network failure.
+      // Never label it blocked without a router-side read-back or target-device test.
+      result = "unverified";
       if (typeof navigator !== "undefined" && navigator.onLine === false) {
-        result = "unverified";
-        message = "لا يوجد اتصال بالإنترنت — لا يمكن إجراء الاختبار.";
-        messageEn = "No internet connection — the test cannot run.";
+        message = "انقطع اتصال الإنترنت أثناء الاختبار — الحالة غير مؤكدة.";
+        messageEn = "The internet connection dropped during the test — status is unverified.";
       } else {
-        result = "likely-blocked";
-        message = "يبدو أن الموقع محجوبًا (تعذر الاتصال).";
-        messageEn = "The site appears to be blocked (connection failed).";
+        message = "فشل الاتصال، لكن لا يمكن الجزم أن الراوتر هو الذي حجب الموقع.";
+        messageEn = "The connection failed, but this does not prove the router blocked the site.";
       }
+    } finally {
+      clearTimeout(timer);
     }
 
     await this.ds.addRouterLog({
       action: "verify-blocking",
       result,
-      message: `اختبار ${domain}: ${message}`,
+      message: `اختبار ${normalizedDomain}: ${message}`,
       device: null,
     });
 
     return {
-      ok: result === "likely-blocked" || result === "likely-reachable",
+      ok: result === "likely-reachable",
       operation: "verify",
       result,
       message,
