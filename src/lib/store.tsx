@@ -358,16 +358,24 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       if (!ds) return { added: 0, skipped: 0 };
       let added = 0;
       let skipped = 0;
+      // Include newly imported rows in duplicate detection, not only the
+      // state snapshot from before the import began.
+      const seen = [...domains];
       for (const entry of entries) {
-        const dup = findDuplicate(entry.domain, domains);
-        if (dup) {
+        const parsed = parseDomainInput(entry.domain);
+        if (!parsed.ok || !parsed.domain || findDuplicate(parsed.domain, seen)) {
           skipped += 1;
           continue;
         }
-        const domain = await ds.addDomain({ domain: entry.domain, category: entry.category });
-        if (!entry.enabled) await ds.updateDomain(domain.id, { enabled: false });
-        setDomains((prev) => [...prev, { ...domain, enabled: entry.enabled }]);
-        added += 1;
+        try {
+          const domain = await ds.addDomain({ domain: parsed.domain, category: entry.category });
+          const saved = entry.enabled ? domain : await ds.updateDomain(domain.id, { enabled: false });
+          seen.push(saved);
+          setDomains((prev) => [...prev, saved]);
+          added += 1;
+        } catch {
+          skipped += 1;
+        }
       }
       return { added, skipped };
     },
