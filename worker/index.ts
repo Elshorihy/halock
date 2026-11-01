@@ -168,7 +168,8 @@ async function handleApi(request: Request, env: Env, url: URL): Promise<Response
     const passwordHash = await hashPassword(crypto.randomUUID());
     const user = await createUser(env.DB, { id, email, displayName, passwordHash });
     const { token } = generateSessionToken();
-    const ttlDays = Number(env.SESSION_TTL_DAYS ?? 3650);
+    // Guest sessions are device-bound; keep them long-lived because there is no login flow to renew them.
+    const ttlDays = 3650;
     await createAuthSession(env.DB, {
       id: newId("sess"),
       userId: id,
